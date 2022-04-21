@@ -1,7 +1,7 @@
 ﻿namespace Dane
 {
-    public class Class1
+    public class Kula
     {
-
+        
     }
 }
