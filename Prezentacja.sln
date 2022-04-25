@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dane", "Dane\Dane.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logika", "Logika\Logika.csproj", "{7E0B98FC-B427-418D-9E96-0D68F138552D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testy", "Tests\Testy.csproj", "{CCCD9AC0-0061-44B2-A1AA-77F15B91DA85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testy", "Testy\Testy.csproj", "{CCCD9AC0-0061-44B2-A1AA-77F15B91DA85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
