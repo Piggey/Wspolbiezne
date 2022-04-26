@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Logika
 {
-    internal class LogicAPI
+    public abstract class LogicAPI
     {
+        public abstract void AddBall();
+        public abstract void RemoveBall();
+        public abstract void RunSimulation();
+        public abstract int GetBallCount();
     }
 }
