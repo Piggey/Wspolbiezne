@@ -3,10 +3,35 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Prezentacja"
+        xmlns:vm1="clr-namespace:ViewModel" d:DataContext="{d:DesignInstance Type=vm1:ViewModelMainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Concurrent programming" 
+        Width="1280"
+        Height="720">
 
+    <Grid>
+        <Button x:Name="startButton" Content="START" Height="50" Width="100" Margin="590,612,590,42" IsEnabled="{Binding State}" Command="{Binding StartButtonClick}" />
+        <Label  Height="50"  Width="240" Margin="213,612,827,42" Content="{Binding ErrorMessage}"/>
+        <TextBox IsEnabled="{Binding State}" Name="intputText" Text="{Binding InputText}" FontSize="30" TextAlignment="Center" Height="50"  Width="240" BorderBrush="Black"  BorderThickness="2" Margin="827,612,213,42"/>
+
+        <Grid x:Name="board" Width="854" Height="480" Margin="213,53,213,171">
+            <Border BorderBrush="Black" Background="Gray" BorderThickness="2">
+                <ItemsControl ItemsSource="{Binding Balls}">
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Ellipse Width= "10" Height="10" Fill="Orange" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter  Property="Canvas.Top" Value="{Binding PositionY}"/>
+                            <Setter Property="Canvas.Left" Value="{Binding PositionX}"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

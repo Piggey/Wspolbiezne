@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logika", "Logika\Logika.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testy", "Testy\Testy.csproj", "{CCCD9AC0-0061-44B2-A1AA-77F15B91DA85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prezentacja", "Prezentacja\Prezentacja.csproj", "{EB2FDC48-7D35-4E6A-9EB4-DE87DBD1B1FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prezentacja", "Prezentacja\Prezentacja.csproj", "{EB2FDC48-7D35-4E6A-9EB4-DE87DBD1B1FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
