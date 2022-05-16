@@ -1,16 +1,9 @@
 ﻿namespace Dane
 {
-    public abstract class DataAPI
+    public abstract class DataApi
     {
-        public static DataAPI CreateData()
-        {
-            return new Data();
-        }
-
-        internal class Data : DataAPI
-        {
-            public Data()
-            { }
-        }
+        public abstract int GetBallCount();
+        public abstract void AddBall();
+        public abstract void RemoveBall();
     }
 }
