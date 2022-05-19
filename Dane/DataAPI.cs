@@ -2,8 +2,19 @@
 {
     public abstract class DataApi
     {
-        public abstract int GetBallCount();
-        public abstract void AddBall();
-        public abstract void RemoveBall();
+        public static Ball CreateBall()
+        {
+            return new Ball();
+        }
+
+        public static int GetBoardWidth()
+        {
+            return 500;
+        }
+
+        public static int GetBoardHeight()
+        {
+            return 500;
+        }
     }
 }
