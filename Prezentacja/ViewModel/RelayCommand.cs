@@ -1,31 +1,28 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace ViewModel
+namespace Prezentacja.ViewModel
 {
-    public class RelayCommand : ICommand
+    public sealed class RelayCommand : ICommand
     {
-
-        public RelayCommand(Action execute) : this(execute, null) { }
-
-        public RelayCommand(Action execute, Func<bool> canExecute)
+        public RelayCommand(Action execute, Func<bool>? canExecute = null)
         {
-            this.m_Execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            this.m_CanExecute = canExecute;
+            this._mExecute = execute ?? throw new ArgumentNullException(nameof(execute));
+            this._mCanExecute = canExecute;
         }
 
         public bool CanExecute(object? parameter)
         {
-            if (this.m_CanExecute == null)
+            if (this._mCanExecute == null)
                 return true;
             if (parameter == null)
-                return this.m_CanExecute();
-            return this.m_CanExecute();
+                return this._mCanExecute();
+            return this._mCanExecute();
         }
 
-        public virtual void Execute(object? parameter)
+        public void Execute(object? parameter)
         {
-            this.m_Execute();
+            this._mExecute();
         }
 
 
@@ -36,7 +33,7 @@ namespace ViewModel
             this.CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private readonly Action m_Execute;
-        private readonly Func<bool> m_CanExecute;
+        private readonly Action _mExecute;
+        private readonly Func<bool>? _mCanExecute;
     }
 }

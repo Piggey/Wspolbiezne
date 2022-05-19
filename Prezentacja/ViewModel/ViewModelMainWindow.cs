@@ -1,126 +1,86 @@
-﻿using Model;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
-using System.Threading;
 using System;
-using System.Threading.Tasks;
+using System.Windows.Input;
+using Prezentacja.Model;
 
-namespace ViewModel
+namespace Prezentacja.ViewModel
 {
     public class ViewModelMainWindow : INotifyPropertyChanged
     {
-        private ModelAPI modelApi;
-        // private readonly double scale = 5.35;
-        public ObservableCollection<BallInModel> Balls { get; set; }
-        public ICommand StartButtonClick { get; set; }
-        private string inputText;
-        private Task? task;
+        private readonly ModelApi _modelApi;
+        public ObservableCollection<IBall> Balls { get; }
+        public ICommand StartButtonClick { get; }
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        private bool state;
-
+        private bool _state;
         public bool State
         {
-            get
-            {
-                return state;
-            }
+            get => _state;
             set
             {
-                state = value;
+                _state = value;
                 RaisePropertyChanged(nameof(State));
             }
         }
-
-
+        
+        private string _inputText;
         public string InputText
         {
-            get
-            {
-                return inputText;
-            }
+            get => _inputText;
             set
             {
-                inputText = value;
+                _inputText = value;
                 RaisePropertyChanged(nameof(InputText));
             }
         }
-
-        private string errorMessage;
-
+        
+        private string _errorMessage;
         public string ErrorMessage
         {
-            get 
-            { 
-                return errorMessage; 
-            }
+            get => _errorMessage;
             set 
             { 
-                errorMessage = value;
+                _errorMessage = value;
                 RaisePropertyChanged(nameof(ErrorMessage));
             }
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public ViewModelMainWindow() : this(ModelAPI.CreateApi())
-        {
+        public ViewModelMainWindow() : this(ModelApi.CreateModelApi()) { }
 
-        }
-
-        public ViewModelMainWindow(ModelAPI baseModel)
-        {
+        private ViewModelMainWindow(ModelApi baseModel)
+        {  
             State = true;
-            this.modelApi = baseModel;
-            StartButtonClick = new RelayCommand(() => StartButtonClickHandler());
-            Balls = new ObservableCollection<BallInModel>();
+            _modelApi = baseModel;
+            StartButtonClick = new RelayCommand(StartButtonClickHandler);
+            Balls = new ObservableCollection<IBall>();
+            IDisposable observer = _modelApi.Subscribe(x => Balls.Add(x));
         }
-
         private void StartButtonClickHandler()
         {
-            modelApi.AddBallsAndStart(readFromTextBox());
-            task = new Task(UpdatePosition);
-            task.Start();
+            _modelApi.AddBallsAndStart(ReadFromTextBox());
         }
 
-        public void UpdatePosition()
+        private int ReadFromTextBox()
         {
-            while(true)
-            {
-                ObservableCollection<BallInModel> treadList = new ObservableCollection<BallInModel>();
-
-                foreach (BallInModel ball in modelApi.Balls)
-                {
-                    treadList.Add(ball);
-                }
-
-                Balls = treadList;
-                RaisePropertyChanged(nameof(Balls));
-                Thread.Sleep(10); 
-            }
-        }
-
-        public int readFromTextBox()
-        {
-            int number;
-            if (Int32.TryParse(InputText, out number) && InputText != "0")
+            if (Int32.TryParse(InputText, out var number) && InputText != "0")
             {
                 number = Int32.Parse(InputText);
                 ErrorMessage = "";
                 State = false;
-                if (number > 100)
+                if (number > 10)
                 {
-                    return 100;
+                    return 10;
                 }
                 return number;
             }
             ErrorMessage = "Nieprawidłowa liczba";
             return 0;
         }
-             
-        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+
+        private void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

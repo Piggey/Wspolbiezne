@@ -1,6 +1,12 @@
-namespace Prezentacja.Model;
+using System.ComponentModel;
+using System.Numerics;
 
-public class IBall
+namespace Prezentacja.Model
 {
-    
+    public interface IBall : INotifyPropertyChanged
+    {
+        float Top { get; }
+        float Left { get; }
+        float Radius { get; }
+    }
 }
