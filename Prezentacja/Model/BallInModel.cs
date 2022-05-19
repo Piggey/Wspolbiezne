@@ -1,23 +1,51 @@
-﻿using Logika;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-namespace Model
+namespace Prezentacja.Model
 {
-
-    public class BallInModel
+    public class BallInModel : IBall
     {
-        private const int VIEW_WIDTH = 854;
-        private const int VIEW_HEIGHT = 480;
-        
-        private Ball ball;
+        public float Radius { get; }
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        public BallInModel(Ball ball)
+        public BallInModel(float top, float left, float radius)
         {
-            this.ball = ball;
+            Top = top;
+            Left = left;
+            Radius = radius;
+        } 
+        
+        private float _top;
+        public float Top
+        {
+            get => _top;
+            private set 
+            {
+                _top = value;
+                RaisePropertyChanged();
+            }
         }
 
-        public double PositionX => (ball.x * VIEW_WIDTH) / Board.WIDTH;
+        private float _left;
+        public float Left
+        {
+            get => _left;
+            private set
+            {
+                _left = value;
+                RaisePropertyChanged();
+            }
+        }
+        
+        public void Move(float positionX, float positionY)
+        {
+            Left = positionX;
+            Top = positionY;
+        }
 
-        public double PositionY => (ball.y * VIEW_HEIGHT) / Board.HEIGHT;
-
+        private void RaisePropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        } 
     }
 }
