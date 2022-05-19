@@ -1,59 +1,133 @@
-﻿
-namespace Dane
+﻿using System.Reactive;
+using System.Reactive.Linq;
+using Dane;
+
+namespace Logika 
 {
-    public class Board : DataApi
+    public class Board : LogicApi, IObservable<int>
     {
-        // keep the ratio 16:9
-        public const int Width = 160;
-        public const int Height = 90;
-        
-        public List<Task> BallTasks { get; private set; }
-        public List<Ball> Balls { get; set; }
-        public int Size { get; private set; }
+        private List<Ball> Balls { get; }
+        private int Size { get; set; }
+        private static object _lock = new object();
+        private CollisionDetector _collisionDetector;
+
+        private IDisposable _unsubscriber;
+        private readonly IObservable<EventPattern<BallChangedEventArgs>> _eventObservable;
+        public event EventHandler<BallChangedEventArgs> BallChanged;
 
         public Board()
         {
-            BallTasks = new List<Task>();
             Balls = new List<Ball>();
             Size = Balls.Count;
+            _eventObservable = Observable.FromEventPattern<BallChangedEventArgs>(this, "BallChanged");
+            _collisionDetector = new CollisionDetector();
         }
 
-        /// <summary>
-        /// Get current count of created Ball Tasks
-        /// </summary>
-        /// <returns>Task count</returns>
         public override int GetBallCount()
         {
             return Size;
         }
 
-        /// <summary>
-        /// Start new Task running a single Ball in loop
-        /// </summary>
-        public override void AddBall()
+        public override Ball AddBall()
         {
-            Ball b = new Ball(Size);
-            Task t = new Task(b.MoveLoop);
-            BallTasks.Add(t);
+            Ball b = DataApi.CreateBall(); 
+            Task t = new Task(b.Loop);
             Balls.Add(b);
             t.Start();
             Console.WriteLine($"Board: Task #{Size} created.");
             Size++;
+
+            return b;
         }
 
-        /// <summary>
-        /// Kills newest Task of a Ball in loop created
-        /// </summary>
         public override void RemoveBall()
         {
             if (Size == 0)
-                return;
-            
-            Balls[Size - 1].Token.can
-            
-            BallTasks.RemoveAt(Size - 1);
-            Console.WriteLine($"Board: Task #{Size} ended.");
+                throw new IndexOutOfRangeException("RemoveBall: There are no balls to be removed.");
+
             Size--;
+            Balls[Size].Cancelled = true;
+            Balls.RemoveAt(Size);
+            Console.WriteLine($"Board: Task #{Size} ended.");
         }
+
+        public override Ball GetBall(int id)
+        {
+            if (id < 0 || id >= Size)
+                throw new IndexOutOfRangeException("GetBall: id out of range.");
+            
+            return Balls[id];
+        }
+
+        public override int GetBoardWidth()
+        {
+            return DataApi.GetBoardWidth();
+        }
+
+        public override int GetBoardHeight()
+        {
+            return DataApi.GetBoardHeight();
+        }
+
+
+        #region observer
+        
+            public virtual void Subscribe(IObservable<int> provider)
+            {
+                _unsubscriber = provider.Subscribe(this);
+            }
+            
+            public override void OnCompleted()
+            {
+                _unsubscriber.Dispose();
+            }
+
+            public override void OnError(Exception error)
+            {
+                throw error;
+            }
+
+            public override void OnNext(int value)
+            {
+                Monitor.Enter(_lock);
+                try
+                {
+                    // check every ball against each other
+                    for (int i = 0; i < Size; i++)
+                    {
+                        for (int j = 0; j < Size; j++)
+                        {
+                            if (i == j)
+                                continue;
+
+                            _collisionDetector.CheckCollision(Balls[i], Balls[j]);
+                        }
+                    }
+
+                }
+                catch (SynchronizationLockException ex)
+                {
+                    throw new Exception("CollisionCheck: could not synchronize.", ex);
+                }
+                finally
+                {
+                    Monitor.Exit(_lock);
+                }
+            }
+
+            #endregion
+
+        #region observable
+
+            public override IDisposable Subscribe(IObserver<int> observer)
+            {
+                return _eventObservable.Subscribe(
+                    x => observer.OnNext(x.EventArgs.BallId),
+                    observer.OnError,
+                    observer.OnCompleted
+                );
+            }
+
+        #endregion
     }
 }
