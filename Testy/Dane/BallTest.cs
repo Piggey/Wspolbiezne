@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Dane;
 
-namespace Testy.TestyDanych
+namespace Testy.Dane
 {
     [TestClass]
     public class BallTest
@@ -9,36 +9,36 @@ namespace Testy.TestyDanych
         [TestMethod]
         public void BallConstructorTest()
         {
-            Ball b = new Ball();
+            Ball b = DataApi.CreateBall();
 
             Assert.IsTrue(b.Position.X > 0);
-            Assert.IsTrue(b.Position.X < Board.Width);
+            Assert.IsTrue(b.Position.X < DataApi.GetBoardWidth());
 
             Assert.IsTrue(b.Position.Y > 0);
-            Assert.IsTrue(b.Position.Y < Board.Height);
+            Assert.IsTrue(b.Position.Y < DataApi.GetBoardHeight());
 
-            Assert.IsTrue(b.Velocity.X >= 0.2);
-            Assert.IsTrue(b.Velocity.X <= 1);
+            Assert.IsTrue(b.Velocity.X >= 2);
+            Assert.IsTrue(b.Velocity.X <= 5);
 
-            Assert.IsTrue(b.Velocity.Y >= 0.2);
-            Assert.IsTrue(b.Velocity.Y <= 1);
+            Assert.IsTrue(b.Velocity.Y >= 2);
+            Assert.IsTrue(b.Velocity.Y <= 5);
         }
 
         [TestMethod]
         public void MoveTest()
         {
-            Ball b = new Ball();
-            b.Position = b.Position with { X = Board.Width - 4 };
+            Ball b = DataApi.CreateBall();
+            b.Position = b.Position with { X = DataApi.GetBoardWidth() - 4 };
             b.Velocity = b.Velocity with { X = 4 };
 
             Assert.AreEqual(4, b.Velocity.X);
             
             b.Move();
 
-            Assert.AreEqual(Board.Width, b.Position.X);
+            Assert.AreEqual(DataApi.GetBoardWidth(), b.Position.X);
             Assert.AreEqual(-4, b.Velocity.X);
 
-            b.Position = b.Position with { Y = Board.Height - 2 };
+            b.Position = b.Position with { Y = DataApi.GetBoardHeight() - 2 };
             b.Velocity = b.Velocity with { Y = 3 };
             Assert.AreEqual(3, b.Velocity.Y);
 

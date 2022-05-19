@@ -1,37 +1,53 @@
-﻿<Window x:Class="Prezentacja.MainWindow"
+﻿<Window x:Class="View.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm1="clr-namespace:ViewModel" d:DataContext="{d:DesignInstance Type=vm1:ViewModelMainWindow}"
+        xmlns:viewModel="clr-namespace:Prezentacja.ViewModel"
         mc:Ignorable="d"
         Title="Concurrent programming" 
-        Width="1280"
-        Height="720">
+        Width="1024"
+        Height="900"
+        WindowState="Maximized">
+    
+    <Window.DataContext>
+        <viewModel:ViewModelMainWindow />
+    </Window.DataContext>
+    <StackPanel Orientation="Vertical">
 
+    <Canvas Width="650" Height="850">
     <Grid>
-        <Button x:Name="startButton" Content="START" Height="50" Width="100" Margin="590,612,590,42" IsEnabled="{Binding State}" Command="{Binding StartButtonClick}" />
-        <Label  Height="50"  Width="240" Margin="213,612,827,42" Content="{Binding ErrorMessage}"/>
-        <TextBox IsEnabled="{Binding State}" Name="intputText" Text="{Binding InputText}" FontSize="30" TextAlignment="Center" Height="50"  Width="240" BorderBrush="Black"  BorderThickness="2" Margin="827,612,213,42"/>
+        <Button Content="START" Height="50" Width="100" Margin="275,744,275,40" IsEnabled="{Binding State}" Command="{Binding StartButtonClick}" />
+        <Label  Height="50"  Width="240" Margin="205,612,205,172" Content="{Binding ErrorMessage}"/>
+        <TextBox IsEnabled="{Binding State}" Text="{Binding InputText}" FontSize="30" TextAlignment="Center" Height="50"  Width="240" BorderBrush="Black"  BorderThickness="2" Margin="205,667,205,117"/>
 
-        <Grid x:Name="board" Width="854" Height="480" Margin="213,53,213,171">
-            <Border BorderBrush="Black" Background="Gray" BorderThickness="2">
+        <Grid Height="550" Width="550" Margin="25,27,25,207" >
+
+            <Border BorderBrush="Black" Background="Gray" BorderThickness="3">
                 <ItemsControl ItemsSource="{Binding Balls}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas Height="550" Width="550" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Ellipse Width= "10" Height="10" Fill="Orange" />
+                            <Ellipse Width= "{Binding Radius}" Height="{Binding Radius}" Fill="Aquamarine" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
 
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
-                            <Setter  Property="Canvas.Top" Value="{Binding PositionY}"/>
-                            <Setter Property="Canvas.Left" Value="{Binding PositionX}"/>
+                            <Setter  Property="Canvas.Top" Value="{Binding Left}"/>
+                            <Setter Property="Canvas.Left" Value="{Binding Top}"/>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>
             </Border>
         </Grid>
     </Grid>
+           
+    </Canvas>
+    </StackPanel>
 </Window>
