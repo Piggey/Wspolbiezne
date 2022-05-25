@@ -1,110 +1,128 @@
-﻿using System.Numerics;
+using System.ComponentModel;
+using System.Numerics;
 
 namespace Dane
 {
-    public class Ball
+    public class Ball : INotifyPropertyChanged
     {
-        private const float SpeedMin = 2f;
-        private const float SpeedMax = 5f;
-        
-        private const float RadiusMin = 15f;
-        private const float RadiusMax = 20f;
-
-        public int Id { get; }
-        public Vector2 Position { get; set; }
-        public Vector2 Velocity { get; set; }
-        public float Radius { get; set; }
-        public float Mass { get; set; }
-        public bool Cancelled { get; set; }
-        
-        public int CollisionCooldown { get; set; }
-
-        private readonly IList<IObserver<int>> _observers; 
-        
-        public Ball(int id)
-        {
-            Random r = new Random();
-
-            Id = id;
-            Cancelled = false;
-
-            _observers = new List<IObserver<int>>();
-
-            Position = new Vector2(
-                r.NextSingle() * DataApi.GetBoardWidth(),
-                r.NextSingle() * DataApi.GetBoardHeight()
-            );
-
-            Velocity = new Vector2(
-                r.NextSingle() * (SpeedMax - SpeedMin) + SpeedMin,
-                r.NextSingle() * (SpeedMax - SpeedMin) + SpeedMin
-            );
-
-            Radius = r.NextSingle() * (RadiusMax - RadiusMin) + RadiusMin;
-            Mass = Radius; // make mass relative to radius 
-            
-            Console.WriteLine($"Ball: new Ball created. [ id: {Id}, " +
-            $"position: {Position}, velocity: {Velocity}, radius: {Radius}, mass: {Mass} ]");
-        }
-
+        private Vector2 _vectorCurrent;
+        private int _radius;
+        private float _mass;
+        private Vector2 _velocity;
+        private bool _canMove = true;
+     
         public Ball()
         {
-            Random r = new Random();
-
-            Id = -1;
-            Cancelled = false;
-            
-            _observers = new List<IObserver<int>>();
-
-            Position = new Vector2(
-                r.NextSingle() * DataApi.GetBoardWidth(),
-                r.NextSingle() * DataApi.GetBoardHeight()
-            );
-
-            Velocity = new Vector2(
-                r.NextSingle() * (SpeedMax - SpeedMin) + SpeedMin,
-                r.NextSingle() * (SpeedMax - SpeedMin) + SpeedMin
-            );
-
-            Radius = r.NextSingle() * (RadiusMax - RadiusMin) + RadiusMin;
-            Mass = Radius; 
-            
-            Console.WriteLine($"Ball: new Ball created. [ id: {Id}, " +
-            $"position: {Position}, velocity: {Velocity}, radius: {Radius}, mass: {Mass} ]");
         }
 
-        public void Move()
+        public Ball(Vector2 vector)
         {
-            Position = Vector2.Add(Position, Velocity);
-            if (Position.X <= 0)
-            {
-                Position = Position with { X = 0, Y = Position.Y };
-                Velocity = Velocity with { X = -Velocity.X, Y = Velocity.Y };
-            }
-
-            if (Position.X >= DataApi.GetBoardWidth())
-            {
-                Position = Position with { X = DataApi.GetBoardWidth(), Y = Position.Y };
-                Velocity = Velocity with { X = -Velocity.X, Y = Velocity.Y };
-            }
-
-            if (Position.Y <= 0)
-            {
-                Position = Position with { X = Position.X, Y = 0 };
-                Velocity = Velocity with { X = Velocity.X, Y = -Velocity.Y };
-            }
-
-            if (Position.Y >= DataApi.GetBoardHeight())
-            {
-                Position = Position with { X = Position.X, Y = DataApi.GetBoardHeight() };
-                Velocity = Velocity with { X = Velocity.X, Y = -Velocity.Y };
-            }
+            _vectorCurrent = vector;
+            _radius = 15;
         }
 
-        public void Loop()
+        public Ball(float x, float y, int radius, float mass, Vector2 velocity)
         {
-            while (!Cancelled)
-                Move();
+            _vectorCurrent.X = x;
+            _vectorCurrent.Y = y;
+            _radius = radius;
+            _mass = mass;
+            _velocity = velocity;
         }
+
+        public void UpdatePosition()
+        {
+            if (_canMove)
+            {
+                _vectorCurrent += _velocity;
+                _canMove = false;
+                RaisePropertyChanged("VectorCurrent");
+            }
+        }
+
+        public Vector2 VectorCurrent
+        {
+            get => _vectorCurrent;
+            set => _vectorCurrent = value; 
+        }
+        public Vector2 Velocity
+        {
+            get => _velocity;
+            set => _velocity = value;
+        }
+        public bool CanMove
+        {
+            get => _canMove;
+            set { _canMove = value; }
+        }
+
+        public float X
+        {
+            get => _vectorCurrent.X;
+            set
+            {
+                _vectorCurrent.X = value;
+                RaisePropertyChanged("X"); 
+            }
+        }
+
+        public float Y
+        {
+            get => _vectorCurrent.Y;
+            set
+            {
+                _vectorCurrent.Y = value;
+                RaisePropertyChanged("Y");
+            }
+        }
+
+        public int Radius
+        {
+            get => _radius;
+        }
+
+        public float Mass
+        {
+            get => _mass;
+            set
+            {
+                _mass = value;
+            }
+        }
+
+        public float VX
+        {
+            get => _velocity.X;
+            set
+            {
+                if (value > 5)
+                    value = 5;
+                else if (value < -5)
+                    value = -5;
+                _velocity.X = value;
+            }
+        }
+
+        public float VY
+        {
+            get => _velocity.Y;
+            set
+            {
+                if (value > 5)
+                    value = 5;
+                else if (value < -5)
+                    value = -5;
+                _velocity.Y = value;
+            }
+        }
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void RaisePropertyChanged(string propertyName)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
     }
 }
