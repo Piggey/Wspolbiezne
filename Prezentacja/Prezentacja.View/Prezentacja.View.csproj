@@ -7,4 +7,12 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Include="PresentationView.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Prezentacja.ViewModel\Prezentacja.ViewModel.csproj" />
+  </ItemGroup>
+
 </Project>
