@@ -1,8 +1,9 @@
 using System.Collections.ObjectModel;
+using System.Text.Json;
 
 namespace Dane
 {
-    public class Storage 
+public class Storage 
     {
         public static int _width = 800;
         public static int _height = 400;
@@ -12,6 +13,9 @@ namespace Dane
         CancellationTokenSource tokenSource;
         CancellationToken token;
         private object _lock = new object();
+        private object _lockFile = new object();
+        string fileName = "logs.json";
+
 
         public Storage()
         {
@@ -26,7 +30,7 @@ namespace Dane
         public void AddBall(Ball ball)
         {
             _balls.Add(ball);
-        }
+         }
 
         public void RemoveBall(Ball ball)
         {
@@ -44,8 +48,9 @@ namespace Dane
                     Ball ball = _generator.GenerateBall();
                     AddBall(ball);
                 }
+                Moving();
             }
-            Moving();
+            
         }
 
         public void StopBalls()
@@ -58,20 +63,15 @@ namespace Dane
             }
         }
 
-        public async void Moving()
+        public void Moving()
         {
             foreach (Ball ball in _balls)
             {
-                Task task = Task.Run(() =>
+                Task task = Task.Run(async () =>
                 {
                     while (true)
                     {
-                        Thread.Sleep(8);
-                        lock(_lock)
-                        {
-                            ball.UpdatePosition();
-                            while (ball.CanMove == false) { }
-                        }
+                        await Task.Delay(5);
                         ball.UpdatePosition();
                         try { token.ThrowIfCancellationRequested(); }
                         catch (System.OperationCanceledException) { break; } //Rzuca OperationCanceledException jeżeli jest zgłoszone cancel.
@@ -79,11 +79,38 @@ namespace Dane
                 });
                 _tasks.Add(task);
             }
+            _tasks.Add(Task.Run(async () =>
+            {
+                System.IO.File.WriteAllText(fileName, string.Empty);
+                while (true)
+                { 
+                    var options = new JsonSerializerOptions { WriteIndented = true };
+                    string jsonString = JsonSerializer.Serialize(_balls, options);
+                    string jsonString2 = "[ \"Date/Time\": \"" + DateTime.Now.ToString() + "\",\n  \"Balls\": " + jsonString + " ]\n"; 
+                    lock (_lockFile)
+                    {
+                        File.AppendAllText(fileName, jsonString2);
+                    }
+                    try { token.ThrowIfCancellationRequested(); }
+                    catch (System.OperationCanceledException) { break; } //Rzuca OperationCanceledException jeżeli jest zgłoszone cancel.
+                    await Task.Delay(2000);
+                }
+            }));
         }
 
         public Generator Generator
         {
             get => _generator;
+        }
+
+        public object LockFile
+        {
+            get => _lockFile;
+        }
+
+        public string FileName
+        {
+            get => fileName;
         }
 
         public ObservableCollection<Ball> Balls

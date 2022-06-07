@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using Dane;
 
 namespace Dane
 {
@@ -15,6 +14,9 @@ namespace Dane
         public abstract ObservableCollection<Ball> GetBalls();
         public abstract int Width { get; }
         public abstract int Height { get; }
+        public abstract object LockFile { get; }
+        public abstract string FileName { get; }
+        public abstract void lockOnFile();
     }
     
     public class DataApi : DataAbstractApi
@@ -50,6 +52,18 @@ namespace Dane
         public override int Width
         {
             get => storage.Width;
+        }
+        public override object LockFile
+        {
+            get => storage.LockFile;
+        }
+        public override string FileName
+        {
+            get => storage.FileName;
+        }
+        public override void lockOnFile()
+        {
+
         }
     }
 }
