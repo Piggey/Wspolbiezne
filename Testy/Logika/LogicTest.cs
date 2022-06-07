@@ -13,8 +13,7 @@ namespace Testy.Logika
         [TestMethod]
         public void TestLogicApi()
         {
-            DataAbstractApi data = DataAbstractApi.CreateApi();
-            LogicAbstractApi logic = LogicAbstractApi.CreateApi(data);
+            LogicAbstractApi logic = LogicAbstractApi.CreateApi();
             
             Assert.IsTrue(logic.Height == 400);
             Assert.IsTrue(logic.Width == 800);
@@ -38,7 +37,6 @@ namespace Testy.Logika
         [TestMethod]
         public void TestLogic()
         {
-            DataAbstractApi data = DataAbstractApi.CreateApi();
             LogicAbstractApi logic = LogicAbstractApi.CreateApi(); 
             
             logic.CreateBalls(1); 
